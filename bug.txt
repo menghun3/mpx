@@ -1,0 +1,4 @@
+[bug:1]
+mpxcmd version:0.1.0.0 May 11 2013
+中文路径播放失败
+fix:使用MultiByteToWideChar替换mbstowcs转换

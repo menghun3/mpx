@@ -1,0 +1,13 @@
+[0.1.0.0]mpx
+支持播放mp3格式
+支持播放
+支持暂停
+支持停止
+
+发布对外接口
+void mpxInit();
+void mpxDestroy();
+void mpxPlayFile(void *path);
+void mpxPlay();
+void mpxPause();
+void mpxStop();
