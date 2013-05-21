@@ -1,0 +1,19 @@
+编译mpx音乐播放器
+
+环境
+Microsoft Visual Studio 2010
+下载路径
+http://www.microsoft.com/zh-cn/download/details.aspx?id=12187
+
+Microsoft Visual Studio 2010 Service Pack 1
+下载路径
+http://www.microsoft.com/zh-cn/download/details.aspx?id=23691
+
+Microsoft DirectX SDK (June 2010)
+下载路径
+http://download.microsoft.com/download/A/E/7/AE743F1F-632B-4809-87A9-AA1BB3458E31/DXSDK_Jun10.exe
+
+打开
+mpx.sln解决方案
+编译mpx工程生成静态库（或者直接编译mpxcmd工程）
+编译mpxcmd工程生成可执行文件
