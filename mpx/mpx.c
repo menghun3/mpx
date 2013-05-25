@@ -39,6 +39,7 @@ IGraphBuilder *pGraph = NULL;
 IMediaControl *pControl = NULL;
 IMediaEvent *pEvent = NULL;
 IMediaSeeking *pSeek = NULL;
+IBasicAudio *pBA = NULL;
 #endif
 HANDLE h = NULL;
 int threadid = 0;
@@ -57,6 +58,8 @@ void mpPause();
 int mpGetCurrentPosition(long long *curpos);
 int mpGetPositions(long long *curpos, long long *stoppos);
 int mpGetStopPosition(long long *stoppos);
+int mpGetVolume(long *plVolume);
+int mpPutVolume(long lVolume);
 
 // 播放文件
 void mpxPlayFile(void *path)
@@ -118,6 +121,16 @@ int mpxGetPositions(long long *curpos, long long *stoppos)
 int mpxGetStopPosition(long long *stoppos)
 {
 	return mpGetCurrentPosition(stoppos);
+}
+
+int mpxGetVolume(long *plVolume)
+{
+	return mpGetVolume(plVolume);
+}
+
+int mpxPutVolume(long lVolume)
+{
+	return mpPutVolume(lVolume);
 }
 
 #ifdef DS_CPP
@@ -329,13 +342,27 @@ void InitPlay()
 		return;
 	}
 
+	hr = IGraphBuilder_QueryInterface(pGraph, &IID_IBasicAudio, (void **)&pBA);
+	if (FAILED(hr))
+	{
+		printf("get basic audio error\n");
+		return;
+	}
+
 }
 
 void DestroyPlay()
 {
+	IBasicAudio_Release(pBA);
+	pBA = NULL;
+	IMediaSeeking_Release(pSeek);
+	pSeek = NULL;
 	IMediaControl_Release(pControl);
+	pControl = NULL;
 	IMediaEvent_Release(pEvent);
+	pEvent = NULL;
 	IGraphBuilder_Release(pGraph);
+	pGraph = NULL;
 	CoUninitialize();
 }
 
@@ -412,6 +439,32 @@ int mpGetStopPosition(long long *stoppos)
 	return hr;
 }
 
+int mpGetVolume(long *plVolume)
+{
+	HRESULT hr = 0;
+	if (plVolume == NULL)
+	{
+		return hr;
+	}
+	if (pBA)
+	{
+		hr = IBasicAudio_get_Volume(pBA, plVolume);
+	}
+	return hr;
+}
+
+//从-10000到0
+int mpPutVolume(long lVolume)
+{
+	HRESULT hr = 0;
+
+	if (pBA)
+	{
+		hr = IBasicAudio_put_Volume(pBA, lVolume);
+	}
+	return hr;
+}
+
 void PlayThread(void *param)
 {
 	WCHAR *songpath = (WCHAR *)param;
@@ -481,11 +534,14 @@ void CheckThread(void *param)
 		long long stoppos = 0;
 		long long curpos = 0;
 		Sleep(1000);
+		if (pSeek == NULL)
+		{
+			return;
+		}
 		hr = IMediaSeeking_GetPositions(pSeek, &curpos, &stoppos);
 		if (curpos == stoppos)
 		{
 			PostThreadMessage(threadid, PT_QUIT, (WPARAM)0, (LPARAM)0);
-			printf("play end\n");
 			return;
 		}
 	}

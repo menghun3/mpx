@@ -30,11 +30,25 @@ typedef enum
 	CUSTOMER_STOP,
 	CUSTOMER_PREV,
 	CUSTOMER_NEXT,
-	CUSTOMER_ADD,
-	CUSTOMER_ADDDIR,
-	CUSTOMER_SAVEPL,
+	CUSTOMER_PLAYLIST,
+	CUSTOMER_SET,
 	CUSTOMER_LAST
-}CUSTOMER_CTROL;
+}CUSTOMER_CTRL;
+
+typedef enum
+{
+	PLAYLIST_ADD = 1,
+	PLAYLIST_ADDDIR,
+	PLAYLIST_SAVEPL,
+	PLAYLIST_LAST
+}PLAYLIST_CTRL;
+
+typedef enum
+{
+	SET_VOLUME_PLUS = 1,
+	SET_VOLUME_MINUS,
+	SET_LAST
+}SET_CTRL;
 
 int status = 0;
 int i = 0;
@@ -43,6 +57,9 @@ void BeginTimeEvent();
 void EndTimeEvent();
 char *MakeLyricPathFromSongPath(char *songPath, char *lyricPath);
 void PrintLyric();
+void PrintVolume();
+void setVolumePlus();
+void setVolumeMinus();
 
 void print_version()
 {
@@ -54,19 +71,33 @@ int print_defaultplaylist()
 {
 	int total = 0;
 	int i = 0;
+	COORD pos = {0,11};
+	HANDLE hOut = NULL;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE); // 获取标准输出设备句柄
+	if (!GetConsoleScreenBufferInfo(hOut, &csbi))
+	{
+		return 0;
+	}
+	
 	total = GetDefaultPlaylistTotalItem();
 	if (total == 0)
 	{
 		return -1;
 	}
 
+	SetConsoleCursorPosition(hOut, pos);
+
 	while (i < total)
 	{
 		char *p;
 		p = GetItemFromDefaultPlaylist(i);
-		printf("%d:%s\n", i, p);
+		printf("%d:%s\n", i+1, p);
 		i++;
 	}
+
+	SetConsoleCursorPosition(hOut, csbi.dwCursorPosition);
 
 	return 0;
 }
@@ -80,9 +111,8 @@ void print_note()
 	printf("%d:stop\t", CUSTOMER_STOP);
 	printf("%d:prev\n", CUSTOMER_PREV);
 	printf("%d:next\t", CUSTOMER_NEXT);
-	printf("%d:add\t", CUSTOMER_ADD);
-	printf("%d:adddir\t", CUSTOMER_ADDDIR);
-	printf("%d:savepl\n", CUSTOMER_SAVEPL);
+	printf("%d:playlist\t", CUSTOMER_PLAYLIST);
+	printf("%d:set\t", CUSTOMER_SET);
 	printf("%d:quit\n", CUSTOMER_QUIT);
 }
 
@@ -95,6 +125,7 @@ void main(int argc, char **argv)
 
 	int ch;
 	int ret = 0;
+	char *p = NULL;
 
 	ret = PlayListInit();
 	if (ret == -1)
@@ -103,7 +134,7 @@ void main(int argc, char **argv)
 		return;
 	}
 
-	mpxInit();
+	//mpxInit();
 	print_note();
 	do 
 	{
@@ -116,8 +147,7 @@ void main(int argc, char **argv)
 				char buf[MAX_PATH]= {0};
 				WCHAR songpath[MAX_PATH] = {0};
 				char lyricpath[MAX_PATH] = {0};
-				char *p;
-				printf("\n");
+				
 				if (print_defaultplaylist() == -1)
 				{
 					printf("play list no item\n");
@@ -125,6 +155,11 @@ void main(int argc, char **argv)
 				}
 				printf("input number choice");
 				scanf("%d", &i);
+				if (i == 0)
+				{
+					break;
+				}
+				i--;
 				p = GetItemFromDefaultPlaylist(i);
 				if (p == NULL)
 				{
@@ -169,7 +204,6 @@ void main(int argc, char **argv)
 			{
 				WCHAR songpath[MAX_PATH] = {0};
 				char lyricpath[MAX_PATH] = {0};
-				char *p;
 				
 				printf("\n");
 				if (i > 0)
@@ -185,13 +219,9 @@ void main(int argc, char **argv)
 				LyricDestroy();
 				LyricInit(lyricpath);
 				MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, p, strlen(p), songpath, MAX_PATH);
-				system("cls");
-				printf("playing:%s\n", p);
-				print_note();
 				EndTimeEvent();
 				mpxPlayFile(songpath);
 				BeginTimeEvent();
-				//PrintLyric();
 				status = 1;
 			}
 			break;
@@ -199,7 +229,6 @@ void main(int argc, char **argv)
 			{
 				WCHAR songpath[MAX_PATH] = {0};
 				char lyricpath[MAX_PATH] = {0};
-				char *p;
 
 				printf("\n");
 				i++;
@@ -218,24 +247,73 @@ void main(int argc, char **argv)
 				EndTimeEvent();
 				mpxPlayFile(songpath);
 				BeginTimeEvent();
-				//PrintLyric();
 				status = 1;
 			}
 			break;
-		case CUSTOMER_ADD:
+		case CUSTOMER_PLAYLIST:
 			{
-				AddFile();
+				int plch;
+				system("cls");
+				printf("%d:add\t", PLAYLIST_ADD);
+				printf("%d:dir\t", PLAYLIST_ADDDIR);
+				printf("%d:save\t", PLAYLIST_SAVEPL);
+				printf("%d:exit\t", PLAYLIST_LAST);
+				do 
+				{
+					plch = getch();
+					plch = plch - '1' + PLAYLIST_ADD;
+					switch (plch)
+					{
+					case PLAYLIST_ADD:
+						{
+							AddFile();
+						}
+						break;
+					case PLAYLIST_ADDDIR:
+						{
+							AddDirFile();
+						}
+						break;
+					case PLAYLIST_SAVEPL:
+						{
+							DefaultPlaylistSave();
+							printf("save play list\n");
+						}
+						break;
+					default:
+						break;
+					}
+				} while (plch != PLAYLIST_LAST);
 			}
 			break;
-		case CUSTOMER_ADDDIR:
+		case CUSTOMER_SET:
 			{
-				AddDirFile();
-			}
-			break;
-		case CUSTOMER_SAVEPL:
-			{
-				DefaultPlaylistSave();
-				printf("save play list\n");
+				int setch;
+				system("cls");
+				printf("%d:vol plus\t", SET_VOLUME_PLUS);
+				printf("%d:vol minus\t", SET_VOLUME_MINUS);
+				printf("%d:exit", SET_LAST);
+
+				do 
+				{
+					setch = getch();
+					setch = setch - '1' + SET_VOLUME_PLUS;
+					switch (setch)
+					{
+					case SET_VOLUME_PLUS:
+						{
+							setVolumePlus();
+						}
+						break;
+					case SET_VOLUME_MINUS:
+						{
+							setVolumeMinus();
+						}
+						break;
+					default:
+						break;
+					}
+				} while (setch != SET_LAST);
 			}
 			break;
 		case CUSTOMER_QUIT:
@@ -247,6 +325,9 @@ void main(int argc, char **argv)
 		default:
 			break;
 		}
+		system("cls");
+		printf("playing:%s\n", p);
+		print_note();
 	} while (1);
 }
 
@@ -360,7 +441,7 @@ void TimeEventProc(UINT wTimerID, UINT msg,DWORD dwUser,DWORD dwl,DWORD dw2)
 	long long stoppos = 0;
 	int curtime;
 	int stoptime;
-	COORD pos = {1,7};
+	COORD pos = {0,7};
 	HANDLE hOut = NULL;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	char *p = NULL;
@@ -376,6 +457,11 @@ void TimeEventProc(UINT wTimerID, UINT msg,DWORD dwUser,DWORD dwl,DWORD dw2)
 
 		printf("\n");
 		i++;
+		if (i > GetDefaultPlaylistTotalItem())
+		{
+			i = 0;
+		}
+
 		p = GetItemFromDefaultPlaylist(i);
 		if (p == NULL)
 		{
@@ -385,10 +471,10 @@ void TimeEventProc(UINT wTimerID, UINT msg,DWORD dwUser,DWORD dwl,DWORD dw2)
 		LyricDestroy();
 		LyricInit(lyricpath);
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, p, strlen(p), songpath, MAX_PATH);
-		system("cls");
-		printf("playing:%s\n", p);
 		mpxPlayFile(songpath);
 		status = 1;
+		system("cls");
+		printf("playing:%s\n", p);
 		print_note();
 	}
 
@@ -427,6 +513,7 @@ void TimeEventProc(UINT wTimerID, UINT msg,DWORD dwUser,DWORD dwl,DWORD dw2)
 	}
 	
 	SetConsoleCursorPosition(hOut, csbi.dwCursorPosition);
+	PrintVolume();
 }
 
 void BeginTimeEvent()
@@ -490,4 +577,43 @@ void PrintLyric()
 	}
 
 	SetConsoleCursorPosition(h, csbi.dwCursorPosition);
+}
+
+void PrintVolume()
+{
+	COORD pos = {0,6};
+	HANDLE hOut = NULL;
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	long lVolume = -1;
+	int i = 0;
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE); // 获取标准输出设备句柄
+	if (!GetConsoleScreenBufferInfo(hOut, &csbi))
+	{
+		return;
+	}
+	SetConsoleCursorPosition(hOut, pos);
+	while (i++ < 30)
+	{
+		printf(" ");
+	}
+	SetConsoleCursorPosition(hOut, pos);
+	mpxGetVolume(&lVolume);
+	printf("vol:%ld\n", lVolume);
+	SetConsoleCursorPosition(hOut, csbi.dwCursorPosition);
+}
+
+void setVolumePlus()
+{
+	long lVolume = 0;
+	mpxGetVolume(&lVolume);
+	lVolume += 50;
+	mpxPutVolume(lVolume);
+}
+
+void setVolumeMinus()
+{
+	long lVolume = 0;
+	mpxGetVolume(&lVolume);
+	lVolume -= 50;
+	mpxPutVolume(lVolume);
 }

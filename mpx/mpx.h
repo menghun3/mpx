@@ -10,5 +10,7 @@ void mpxStop();
 int mpxGetCurrentPosition(long long *curpos);
 int mpxGetPositions(long long *curpos, long long *stoppos);
 int mpxGetStopPosition(long long *stoppos);
+int mpxGetVolume(long *plVolume);
+int mpxPutVolume(long lVolume);
 
 #endif // MPX_H
