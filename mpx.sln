@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpxcmd", "mpxcmd\mpxcmd.vcx
 		{9A033A9A-53A6-4FEB-B300-99A75A05CF14} = {9A033A9A-53A6-4FEB-B300-99A75A05CF14}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mpxUI", "mpxUI\mpxUI.vcxproj", "{0B7280C3-F594-44DA-B438-9079CC283679}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9A033A9A-53A6-4FEB-B300-99A75A05CF14} = {9A033A9A-53A6-4FEB-B300-99A75A05CF14}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +27,10 @@ Global
 		{BAF185C7-1A21-4A38-8C92-40807D72E96C}.Debug|Win32.Build.0 = Debug|Win32
 		{BAF185C7-1A21-4A38-8C92-40807D72E96C}.Release|Win32.ActiveCfg = Release|Win32
 		{BAF185C7-1A21-4A38-8C92-40807D72E96C}.Release|Win32.Build.0 = Release|Win32
+		{0B7280C3-F594-44DA-B438-9079CC283679}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0B7280C3-F594-44DA-B438-9079CC283679}.Debug|Win32.Build.0 = Debug|Win32
+		{0B7280C3-F594-44DA-B438-9079CC283679}.Release|Win32.ActiveCfg = Release|Win32
+		{0B7280C3-F594-44DA-B438-9079CC283679}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

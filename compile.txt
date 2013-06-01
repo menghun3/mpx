@@ -1,5 +1,8 @@
 编译mpx音乐播放器
 
+mpx源代码地址
+https://github.com/menghun3/mpx
+
 环境
 Microsoft Visual Studio 2010
 下载路径
@@ -15,5 +18,6 @@ http://download.microsoft.com/download/A/E/7/AE743F1F-632B-4809-87A9-AA1BB3458E3
 
 打开
 mpx.sln解决方案
-编译mpx工程生成静态库（或者直接编译mpxcmd工程）
+编译mpx工程生成静态库（或者直接编译mpxcmd/mpxui工程）
 编译mpxcmd工程生成可执行文件
+将default.m3u文件拷贝至可执行文件目录(生成m3u方法:dir *.mp3 /b /s > yinyue.m3u)

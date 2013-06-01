@@ -1,3 +1,12 @@
+/*****************************************************************************
+* author menghun3@gmail.com
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation.
+* 
+* source code address https://github.com/menghun3/mpx
+******************************************************************************/
 /*
 使用C语言方式需要定义宏COBJMACROS
 */
@@ -60,6 +69,8 @@ int mpGetPositions(long long *curpos, long long *stoppos);
 int mpGetStopPosition(long long *stoppos);
 int mpGetVolume(long *plVolume);
 int mpPutVolume(long lVolume);
+int mpGetGuidFormat(GUID *pFormat);
+int mpGetRate(double *dRate);
 
 // 播放文件
 void mpxPlayFile(void *path)
@@ -120,7 +131,7 @@ int mpxGetPositions(long long *curpos, long long *stoppos)
 
 int mpxGetStopPosition(long long *stoppos)
 {
-	return mpGetCurrentPosition(stoppos);
+	return mpGetStopPosition(stoppos);
 }
 
 int mpxGetVolume(long *plVolume)
@@ -131,6 +142,16 @@ int mpxGetVolume(long *plVolume)
 int mpxPutVolume(long lVolume)
 {
 	return mpPutVolume(lVolume);
+}
+
+int mpxGetGuidFormat(GUID *pFormat)
+{
+	return mpGetGuidFormat(pFormat);
+}
+
+int mpxGetRate(double *dRate)
+{
+	return mpGetRate(dRate);
 }
 
 #ifdef DS_CPP
@@ -461,6 +482,28 @@ int mpPutVolume(long lVolume)
 	if (pBA)
 	{
 		hr = IBasicAudio_put_Volume(pBA, lVolume);
+	}
+	return hr;
+}
+
+int mpGetGuidFormat(GUID *pFormat)
+{
+	HRESULT hr = 0;
+
+	if (pBA)
+	{
+		hr = IMediaSeeking_GetTimeFormat(pSeek, pFormat);
+	}
+	return hr;
+}
+
+int mpGetRate(double *dRate)
+{
+	HRESULT hr = 0;
+
+	if (pBA)
+	{
+		hr = IMediaSeeking_GetRate(pSeek, dRate);
 	}
 	return hr;
 }

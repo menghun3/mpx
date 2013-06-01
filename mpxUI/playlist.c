@@ -26,10 +26,6 @@ int MakePlayList()
 
 	GetModuleFileName(NULL, defaultlistpath, MAX_PATH);
 	pplpath = strrchr(defaultlistpath, '\\');
-	if (pplpath == NULL)
-	{
-		return -1;
-	}
 	pplpath[1] = '\0';
 	strcpy(g_defaultlistpath, defaultlistpath);
 	sprintf(defaultlistpath, "%s%s", defaultlistpath, DEFAULT_PLAYLIST);
@@ -217,6 +213,7 @@ int DefaultPlaylistDeleteItem(int pos)
 		g_playlisttail->next = NULL;
 		free(lnode);
 		lnode = NULL;
+		g_playlistitemcount--;
 		return 0;
 	}
 
@@ -233,6 +230,7 @@ int DefaultPlaylistDeleteItem(int pos)
 	free(lnode);
 	lnode = NULL;
 	lnodeprev->next = NULL;
+	g_playlistitemcount--;
 	return 0;
 }
 
